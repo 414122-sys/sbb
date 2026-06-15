@@ -1,0 +1,309 @@
+```html
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>電腦遊戲製作課程專題 - MakeCode Arcade/Game:Bit</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    background:#111;
+    color:white;
+    font-family:'Press Start 2P', monospace;
+    line-height:1.8;
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+
+    background:
+    repeating-linear-gradient(
+        0deg,
+        rgba(255,255,255,0.03),
+        rgba(255,255,255,0.03) 2px,
+        transparent 2px,
+        transparent 4px
+    );
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+
+header{
+    text-align:center;
+    padding:40px 20px;
+}
+
+header h1{
+    color:#00ff88;
+    margin-bottom:20px;
+    text-shadow:4px 4px #003300;
+}
+
+header p{
+    color:#ffff66;
+}
+
+.card{
+    background:#222;
+    border:4px solid white;
+    margin:30px 0;
+    padding:25px;
+
+    box-shadow:
+    8px 8px 0 black,
+    inset 0 0 15px rgba(0,255,100,.2);
+}
+
+h2{
+    color:#00ffff;
+    margin-bottom:20px;
+}
+
+.menu{
+    display:flex;
+    flex-wrap:wrap;
+    gap:15px;
+    justify-content:center;
+}
+
+.menu a{
+    text-decoration:none;
+    color:white;
+    background:#0066ff;
+    border:4px solid white;
+    padding:15px 20px;
+}
+
+.menu a:hover{
+    background:#ffcc00;
+    color:black;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+th,td{
+    border:3px solid white;
+    padding:12px;
+}
+
+th{
+    background:#00aa88;
+}
+
+td{
+    background:#333;
+}
+
+iframe{
+    width:100%;
+    height:600px;
+    border:5px solid white;
+    margin-top:20px;
+}
+
+footer{
+    text-align:center;
+    padding:40px;
+    color:#999;
+}
+
+@media(max-width:768px){
+
+iframe{
+    height:400px;
+}
+
+header h1{
+    font-size:20px;
+}
+
+body{
+    font-size:12px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+
+<h1>🎮 電腦遊戲製作課程專題</h1>
+
+<p>MakeCode Arcade / Game:Bit</p>
+
+</header>
+
+<section class="card">
+
+<h2>課程介紹</h2>
+
+<p>
+本課程利用 MakeCode Arcade 與 Game:Bit 學習遊戲開發，
+從角色控制、碰撞判定、計分系統到關卡設計，
+完成屬於自己的遊戲作品。
+</p>
+
+</section>
+
+<section class="card">
+
+<h2>🕹 遊戲選單</h2>
+
+<div class="menu">
+
+<a href="#mario">🍄 瑪利歐吃香菇</a>
+
+<a href="#asteroid">☄️ 隕石危機</a>
+
+<a href="#invaders">👾 太空侵略者</a>
+
+</div>
+
+</section>
+
+<!-- Mario -->
+
+<section id="mario" class="card">
+
+<h2>🍄 瑪利歐吃香菇</h2>
+
+<p>
+控制瑪利歐收集香菇並躲避障礙物，
+成功獲得更多分數。
+</p>
+
+<table>
+
+<tr><th>項目</th><th>內容</th></tr>
+
+<tr><td>遊戲名稱</td><td>瑪利歐吃香菇</td></tr>
+<tr><td>遊戲類型</td><td>平台冒險</td></tr>
+<tr><td>遊戲平台</td><td>MakeCode Arcade</td></tr>
+<tr><td>主角角色</td><td>瑪利歐</td></tr>
+<tr><td>遊戲目標</td><td>收集香菇</td></tr>
+<tr><td>基本玩法</td><td>移動與跳躍</td></tr>
+<tr><td>難度提升</td><td>障礙物增加</td></tr>
+<tr><td>額外挑戰</td><td>限時過關</td></tr>
+
+</table>
+
+<iframe
+src="https://arcade.makecode.com/---placeholder-mario"
+allowfullscreen="allowfullscreen"
+sandbox="allow-popups allow-forms allow-scripts allow-same-origin">
+</iframe>
+
+</section>
+
+<!-- Asteroid -->
+
+<section id="asteroid" class="card">
+
+<h2>☄️ 隕石危機</h2>
+
+<p>
+駕駛太空船穿越隕石帶，
+避免碰撞並努力生存。
+</p>
+
+<table>
+
+<tr><th>項目</th><th>內容</th></tr>
+
+<tr><td>遊戲名稱</td><td>隕石危機</td></tr>
+<tr><td>遊戲類型</td><td>生存射擊</td></tr>
+<tr><td>遊戲平台</td><td>MakeCode Arcade</td></tr>
+<tr><td>主角角色</td><td>太空船</td></tr>
+<tr><td>遊戲目標</td><td>閃避隕石</td></tr>
+<tr><td>基本玩法</td><td>左右移動</td></tr>
+<tr><td>難度提升</td><td>隕石速度增加</td></tr>
+<tr><td>額外挑戰</td><td>挑戰最高分</td></tr>
+
+</table>
+
+<iframe
+src="https://arcade.makecode.com/---placeholder-asteroid"
+allowfullscreen="allowfullscreen"
+sandbox="allow-popups allow-forms allow-scripts allow-same-origin">
+</iframe>
+
+</section>
+
+<!-- Invaders -->
+
+<section id="invaders" class="card">
+
+<h2>👾 太空侵略者</h2>
+
+<p>
+消滅來襲的外星敵人，
+守護地球安全。
+</p>
+
+<table>
+
+<tr><th>項目</th><th>內容</th></tr>
+
+<tr><td>遊戲名稱</td><td>太空侵略者</td></tr>
+<tr><td>遊戲類型</td><td>射擊遊戲</td></tr>
+<tr><td>遊戲平台</td><td>MakeCode Arcade</td></tr>
+<tr><td>主角角色</td><td>太空戰機</td></tr>
+<tr><td>遊戲目標</td><td>消滅敵人</td></tr>
+<tr><td>基本玩法</td><td>發射子彈攻擊</td></tr>
+<tr><td>難度提升</td><td>敵人速度增加</td></tr>
+<tr><td>額外挑戰</td><td>挑戰排行榜</td></tr>
+
+</table>
+
+<iframe
+src="https://arcade.makecode.com/---placeholder-invaders"
+allowfullscreen="allowfullscreen"
+sandbox="allow-popups allow-forms allow-scripts allow-same-origin">
+</iframe>
+
+</section>
+
+<footer>
+
+© MakeCode Arcade Game Project
+
+</footer>
+
+</div>
+
+</body>
+</html>
+```
