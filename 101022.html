@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>銀狼：駭客怪獸大作戰 (Silver Wolf Monster Battle)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons for Cyberpunk Tech Theme -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Orbitron (Sci-Fi) and Press Start 2P (Pixel) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Press+Start+2P&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans TC', 'Orbitron', sans-serif;
+            background-color: #05020c;
+            color: #e2e8f0;
+            user-select: none;
+            overflow-x: hidden;
+        }
+
+        .pixel-font {
+            font-family: 'Press Start 2P', monospace;
+        }
+
+        .cyber-font {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Neon cyber glowing borders */
+        .neon-border-purple {
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.4), inset 0 0 10px rgba(168, 85, 247, 0.2);
+            border: 2px solid rgba(168, 85, 247, 0.6);
+        }
+
+        .neon-border-pink {
+            box-shadow: 0 0 10px rgba(236, 72, 153, 0.4), inset 0 0 10px rgba(236, 72, 153, 0.2);
+            border: 2px solid rgba(236, 72, 153, 0.6);
+        }
+
+        .neon-border-cyan {
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.4), inset 0 0 10px rgba(6, 182, 212, 0.2);
+            border: 2px solid rgba(6, 182, 212, 0.6);
+        }
+
+        /* Scanline Overlay for retro monitor look */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.25) 50%
+            );
+            background-size: 100% 4px;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        /* Glitch Keyframes */
+        @keyframes glitch {
+            0% {
+                clip-path: inset(40% 0 61% 0);
+                transform: skew(0.3deg);
+            }
+            20% {
+                clip-path: inset(92% 0 1% 0);
+                transform: skew(-0.5deg);
+            }
+            40% {
+                clip-path: inset(15% 0 80% 0);
+                transform: skew(0.5deg);
+            }
+            60% {
+                clip-path: inset(80% 0 5% 0);
+                transform: skew(-0.3deg);
+            }
+            80% {
+                clip-path: inset(3% 0 92% 0);
+                transform: skew(0.8deg);
+            }
+            100% {
+                clip-path: inset(40% 0 61% 0);
+                transform: skew(0deg);
+            }
+        }
+
+        .glitch-active {
+            animation: glitch 0.2s linear infinite;
+        }
+
+        /* Screen Shake effect */
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(0px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            75% { transform: translate(2px, 1px) rotate(-2deg); }
+            90% { transform: translate(-1px, -1px) rotate(1deg); }
+            100% { transform: translate(1px, -2px) rotate(0deg); }
+        }
+
+        .shake-active {
+            animation: shake 0.3s ease-out;
+        }
+
+        /* Custom scrollbar for game console logs */
+        .console-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .console-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+        }
+        .console-scrollbar::-webkit-scrollbar-thumb {
+            background: #a855f7;
+            border-radius: 3px;
+        }
+
+        /* Floating Damage Text */
+        .damage-pop {
+            position: absolute;
+            animation: floatUpAndOut 0.8s ease-out forwards;
+            pointer-events: none;
+            z-index: 50;
+            font-weight: 900;
+        }
+
+        @keyframes floatUpAndOut {
+            0% {
+                transform: translateY(0) scale(0.8);
+                opacity: 0;
+            }
+            20% {
+                transform: translateY(-20px) scale(1.3);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-80px) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* Low Health Flashing red warning */
+        @keyframes danger-pulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.4), inset 0 0 5px rgba(239, 68, 68, 0.2); }
+            50% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.9), inset 0 0 15px rgba(239, 68, 68, 0.5); border-color: rgba(239, 68, 68, 1); }
+        }
+        .danger-pulse-active {
+            animation: danger-pulse 1s infinite;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen flex flex-col justify-between overflow-y-auto">
+
+    <!-- Background Matrix rain canvas -->
+    <canvas id="matrixCanvas" class="absolute inset-0 w-full h-full opacity-15 pointer-events-none z-0"></canvas>
+    <!-- CRT monitor filter scanlines -->
+    <div class="scanlines"></div>
+
+    <!-- MAIN GAME LAYOUT -->
+    <div class="relative z-10 flex-1 flex flex-col max-w-6xl w-full mx-auto p-3 sm:p-6 justify-between gap-4">
+        
+        <!-- HEADER HUD -->
+        <header class="w-full bg-slate-950/80 backdrop-blur-md rounded-xl p-4 neon-border-purple flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="text-3xl text-pink-500 animate-pulse"><i class="fa-solid fa-laptop-code"></i></div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 cyber-font">
+                        銀狼：駭客怪獸大作戰
+                    </h1>
+                    <p class="text-xs text-cyan-400 font-bold tracking-widest uppercase">Silver Wolf: Monster Battle v2.1</p>
+                </div>
+            </div>
+            
+            <!-- Stats overview -->
+            <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm font-semibold">
+                <div class="bg-purple-950/50 px-3 py-1.5 rounded-lg border border-purple-800 flex items-center gap-2">
+                    <span class="text-purple-400">LEVEL:</span>
+                    <span id="playerLevelDisplay" class="pixel-font text-purple-300">1</span>
+                </div>
+                <div class="bg-purple-950/50 px-3 py-1.5 rounded-lg border border-purple-800 flex flex-col gap-1 min-w-[100px]">
+                    <div class="flex justify-between text-[10px] text-purple-400">
+                        <span>EXP:</span>
+                        <span id="playerExpText">0/100</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                        <div id="playerExpBar" class="bg-purple-500 h-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="bg-yellow-950/50 px-3 py-1.5 rounded-lg border border-yellow-600 flex items-center gap-2">
+                    <span class="text-yellow-400"><i class="fa-solid fa-coins"></i> GOLD:</span>
+                    <span id="playerGoldDisplay" class="pixel-font text-yellow-300">0</span>
+                </div>
+                <div class="bg-pink-950/50 px-3 py-1.5 rounded-lg border border-pink-700 flex items-center gap-2">
+                    <span class="text-pink-400">STAGE:</span>
+                    <span id="gameStageDisplay" class="pixel-font text-pink-300">1 (Normal)</span>
+                </div>
+                <!-- Mute sound button -->
+                <button id="toggleSoundBtn" onclick="toggleMute()" class="bg-slate-800 hover:bg-slate-700 p-2 rounded-lg text-slate-300 transition-colors">
+                    <i id="soundIcon" class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- BATTLE ARENA Grid -->
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch my-2">
+            
+            <!-- LEFT: Player Status Panel (Silver Wolf) -->
+            <section id="playerPanel" class="lg:col-span-4 bg-slate-950/80 backdrop-blur-md rounded-xl p-5 neon-border-cyan flex flex-col justify-between transition-all duration-300 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-2 bg-cyan-950/80 text-cyan-400 text-xs font-bold rounded-bl-lg border-l border-b border-cyan-800 uppercase tracking-widest">
+                    PLAYER HACKER
+                </div>
+                
+                <div class="flex flex-col items-center text-center mt-2">
+                    <!-- Stylized Avatar Area with Neon Glow -->
+                    <div class="relative w-28 h-28 rounded-2xl bg-gradient-to-br from-cyan-900 to-purple-950 p-1.5 neon-border-cyan flex items-center justify-center mb-4 group overflow-hidden">
+                        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-400/25 via-transparent to-transparent opacity-70"></div>
+                        <div class="text-5xl select-none filter drop-shadow-[0_0_10px_rgba(6,182,212,0.6)] group-hover:scale-110 transition-transform">👩‍💻🎮</div>
+                        <div class="absolute bottom-1 right-2 text-xs bg-cyan-500 text-slate-950 font-bold px-1.5 rounded uppercase">SW-01</div>
+                    </div>
+                    
+                    <h2 class="text-xl font-black text-cyan-400 tracking-wider flex items-center gap-2">
+                        銀狼 <span class="text-xs bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800">Silver Wolf</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1 italic">「別讓我覺得無聊，好嗎？」</p>
+                </div>
+
+                <!-- Stats details list -->
+                <div class="mt-4 space-y-3">
+                    <!-- HP Status Bar -->
+                    <div>
+                        <div class="flex justify-between items-center text-xs mb-1 font-bold">
+                            <span class="text-pink-400"><i class="fa-solid fa-heart"></i> SYSTEM HP</span>
+                            <span id="playerHpText" class="pixel-font text-pink-400 text-[10px] sm:text-xs">100 / 100</span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-5 rounded border border-slate-700 p-0.5 overflow-hidden">
+                            <div id="playerHpBar" class="bg-gradient-to-r from-pink-500 to-rose-600 h-full rounded transition-all duration-300" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <!-- RPG Stats Spec sheet -->
+                    <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800 space-y-2 text-xs">
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-400">🛠️ 普通攻擊傷害</span>
+                            <span id="statAtkRange" class="font-bold text-slate-200">10 ~ 20</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-400">🎯 暴擊機率 / 傷害</span>
+                            <span id="statCritChance" class="font-bold text-purple-400">20% / 2.0x</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-400">💊 藥水系統修復</span>
+                            <span id="statHealRange" class="font-bold text-green-400">15 ~ 25</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-400">💥 駭客爆破 (必殺)</span>
+                            <span class="font-bold text-orange-400">30 ~ 50 (CD: 3)</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CENTER: Active VFX Confrontation Stage -->
+            <section class="lg:col-span-4 bg-slate-950/90 rounded-xl p-4 neon-border-purple flex flex-col justify-between min-h-[250px] relative overflow-hidden">
+                <div class="absolute inset-0 bg-grid opacity-10 pointer-events-none"></div>
+                
+                <div class="text-center font-bold text-purple-400 text-xs tracking-widest border-b border-purple-900/50 pb-2">
+                    VIRUS CONFRONTATION ARENA
+                </div>
+
+                <!-- Dynamic VFX Container (Handles Screen Shakes and Popups) -->
+                <div id="arenaVFXBox" class="flex-1 flex flex-col items-center justify-center relative my-4">
+                    <!-- VS Signal -->
+                    <div class="pixel-font text-3xl text-pink-500/30 font-black absolute z-0 select-none">VS</div>
+                    
+                    <!-- Middle Animation / Laser particles / Glitch sparks -->
+                    <div id="projectileAnim" class="w-full flex justify-between px-10 items-center z-10">
+                        <div id="playerActiveSprite" class="text-4xl transition-all duration-300">👩‍💻</div>
+                        <!-- Animated laser connector beam -->
+                        <div id="cyberLaserBeam" class="flex-1 h-1 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 scale-x-0 origin-left transition-transform duration-300 rounded mx-2 shadow-[0_0_12px_rgba(168,85,247,0.8)]"></div>
+                        <div id="enemyActiveSprite" class="text-4xl transition-all duration-300">👾</div>
+                    </div>
+
+                    <!-- Holographic Arena Display -->
+                    <div id="hologramCircle" class="w-44 h-12 bg-purple-500/10 rounded-[50%] border border-purple-500/30 absolute bottom-4 animate-pulse"></div>
+                </div>
+
+                <!-- Dynamic Subtitle -->
+                <div class="text-center bg-slate-900/90 py-1 px-3 rounded-md border border-slate-800 text-xs text-cyan-300" id="battleSubtext">
+                    系統安全檢測：發現活躍 BUG 威脅。準備執行排除。
+                </div>
+            </section>
+
+            <!-- RIGHT: Monster Status Panel -->
+            <section id="enemyPanel" class="lg:col-span-4 bg-slate-950/80 backdrop-blur-md rounded-xl p-5 neon-border-pink flex flex-col justify-between transition-all duration-300 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-2 bg-pink-950/80 text-pink-400 text-xs font-bold rounded-bl-lg border-l border-b border-pink-800 uppercase tracking-widest">
+                    SYSTEM EXPLOIT
+                </div>
+                
+                <div class="flex flex-col items-center text-center mt-2">
+                    <!-- Monster Glowing Avatar -->
+                    <div id="enemyAvatarBox" class="relative w-28 h-28 rounded-2xl bg-gradient-to-br from-purple-950 to-pink-950 p-1.5 neon-border-pink flex items-center justify-center mb-4 group overflow-hidden">
+                        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-pink-400/25 via-transparent to-transparent opacity-70"></div>
+                        <div id="enemyIcon" class="text-6xl select-none filter drop-shadow-[0_0_10px_rgba(236,72,153,0.6)] group-hover:scale-110 transition-transform">👾</div>
+                        <div id="bossBadge" class="absolute bottom-1 right-2 text-[10px] bg-pink-500 text-slate-950 font-bold px-1 rounded uppercase hidden">BOSS</div>
+                    </div>
+                    
+                    <h2 id="enemyName" class="text-xl font-black text-pink-400 tracking-wider flex items-center gap-2">
+                        BUG Monster <span class="text-xs bg-pink-950 px-2 py-0.5 rounded border border-pink-800">病毒怪</span>
+                    </h2>
+                    <p id="enemySub" class="text-xs text-slate-400 mt-1 italic">危險等級：★★☆☆☆ - 未知溢出錯誤</p>
+                </div>
+
+                <!-- Enemy Stats list -->
+                <div class="mt-4 space-y-3">
+                    <!-- Enemy HP Status Bar -->
+                    <div>
+                        <div class="flex justify-between items-center text-xs mb-1 font-bold">
+                            <span class="text-pink-400"><i class="fa-solid fa-bug"></i> VIRUS INTEGRITY</span>
+                            <span id="enemyHpText" class="pixel-font text-pink-400 text-[10px] sm:text-xs">100 / 100</span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-5 rounded border border-slate-700 p-0.5 overflow-hidden">
+                            <div id="enemyHpBar" class="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded transition-all duration-300" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Enemy Info -->
+                    <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800 space-y-2 text-xs">
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-400">🔥 反擊傷害威力</span>
+                            <span id="enemyAtkDisplay" class="font-bold text-slate-200">5 ~ 15</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-400">🛡️ 核心特質</span>
+                            <span id="enemyTraitDisplay" class="font-bold text-purple-400">溢出代碼 (威脅度低)</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-400">⚠️ BOSS 狂暴狀態</span>
+                            <span id="enemyFuryDisplay" class="font-bold text-slate-500">未啟用</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- ACTION CONTROLS & SHOP PANEL -->
+        <section class="w-full grid grid-cols-1 md:grid-cols-12 gap-4">
+            
+            <!-- Left: Tactics Control Area -->
+            <div class="md:col-span-8 bg-slate-950/80 backdrop-blur-md rounded-xl p-4 sm:p-5 neon-border-purple flex flex-col justify-between">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-xs text-purple-400 font-bold uppercase tracking-widest"><i class="fa-solid fa-terminal"></i> 執行黑客行動代碼</span>
+                    <!-- Ult Cooldown indicator -->
+                    <span id="ultCooldownDisplay" class="text-xs bg-orange-950 text-orange-400 border border-orange-700 px-3 py-0.5 rounded-full font-bold">
+                        💥 駭客爆破：準備就緒
+                    </span>
+                </div>
+                
+                <!-- Action Buttons Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <!-- Normal Attack -->
+                    <button id="btnAttack" onclick="executePlayerTurn('attack')" class="group relative overflow-hidden bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 text-white p-3.5 rounded-xl font-extrabold flex items-center justify-center gap-2 shadow-lg transition-all active:scale-95">
+                        <div class="absolute inset-0 bg-cyan-400/20 translate-y-full group-hover:translate-y-0 transition-transform"></div>
+                        <span class="text-xl">⚔️</span>
+                        <div class="text-left">
+                            <div class="text-sm font-black">普通攻擊</div>
+                            <div class="text-[10px] text-cyan-200 font-normal">注入常規漏洞 (10~20)</div>
+                        </div>
+                    </button>
+
+                    <!-- Heal Potion -->
+                    <button id="btnHeal" onclick="executePlayerTurn('heal')" class="group relative overflow-hidden bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white p-3.5 rounded-xl font-extrabold flex items-center justify-center gap-2 shadow-lg transition-all active:scale-95">
+                        <div class="absolute inset-0 bg-green-400/20 translate-y-full group-hover:translate-y-0 transition-transform"></div>
+                        <span class="text-xl">💊</span>
+                        <div class="text-left">
+                            <div class="text-sm font-black">修復協定</div>
+                            <div class="text-[10px] text-green-200 font-normal">補血 + 自檢防護</div>
+                        </div>
+                    </button>
+
+                    <!-- Hack Ultimate (Glitch Burst) -->
+                    <button id="btnUltimate" onclick="executePlayerTurn('ultimate')" class="group relative overflow-hidden bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 text-white p-3.5 rounded-xl font-extrabold flex items-center justify-center gap-2 shadow-lg transition-all active:scale-95">
+                        <div class="absolute inset-0 bg-orange-400/20 translate-y-full group-hover:translate-y-0 transition-transform"></div>
+                        <span class="text-xl">💥</span>
+                        <div class="text-left">
+                            <div class="text-sm font-black">駭客爆破</div>
+                            <div class="text-[10px] text-orange-200 font-normal">終極致命代碼 (高傷害)</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right: Micro Upgrade Cyber Shop -->
+            <div class="md:col-span-4 bg-slate-950/80 backdrop-blur-md rounded-xl p-4 neon-border-cyan flex flex-col justify-between">
+                <div class="text-xs text-cyan-400 font-bold uppercase tracking-widest mb-2 flex justify-between items-center">
+                    <span><i class="fa-solid fa-microchip"></i> 晶片硬體商店</span>
+                    <span class="text-[10px] text-slate-400">點擊加載強化</span>
+                </div>
+                
+                <div class="space-y-2 flex-1 flex flex-col justify-center">
+                    <!-- Shop Item 1: Attack chip -->
+                    <button onclick="buyUpgrade('attack')" class="w-full bg-slate-900 hover:bg-slate-800 p-2 rounded-lg border border-slate-700 flex justify-between items-center text-left text-xs transition-colors group">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">🔧</span>
+                            <div>
+                                <div class="font-bold text-slate-200 group-hover:text-cyan-400 transition-colors">火力提升晶片</div>
+                                <div class="text-[10px] text-slate-400">永久增加 +5 基礎攻擊力</div>
+                            </div>
+                        </div>
+                        <span class="bg-cyan-950 text-cyan-400 font-bold px-2 py-1 rounded border border-cyan-800">100 G</span>
+                    </button>
+
+                    <!-- Shop Item 2: Heal Up -->
+                    <button onclick="buyUpgrade('heal')" class="w-full bg-slate-900 hover:bg-slate-800 p-2 rounded-lg border border-slate-700 flex justify-between items-center text-left text-xs transition-colors group">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">🧪</span>
+                            <div>
+                                <div class="font-bold text-slate-200 group-hover:text-cyan-400 transition-colors">高級修復核心</div>
+                                <div class="text-[10px] text-slate-400">藥水補血效能增加 +10</div>
+                            </div>
+                        </div>
+                        <span class="bg-cyan-950 text-cyan-400 font-bold px-2 py-1 rounded border border-cyan-800">80 G</span>
+                    </button>
+
+                    <!-- Shop Item 3: Crit chip -->
+                    <button onclick="buyUpgrade('crit')" class="w-full bg-slate-900 hover:bg-slate-800 p-2 rounded-lg border border-slate-700 flex justify-between items-center text-left text-xs transition-colors group">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">💾</span>
+                            <div>
+                                <div class="font-bold text-slate-200 group-hover:text-cyan-400 transition-colors">駭客爆裂模組</div>
+                                <div class="text-[10px] text-slate-400">額外增加 +10% 暴擊率</div>
+                            </div>
+                        </div>
+                        <span class="bg-cyan-950 text-cyan-400 font-bold px-2 py-1 rounded border border-cyan-800">120 G</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- BOTTOM: Cyber Terminal Terminal Logs -->
+        <footer class="w-full bg-slate-950/90 rounded-xl p-4 neon-border-purple flex flex-col">
+            <div class="flex justify-between items-center border-b border-purple-900 pb-2 mb-2">
+                <div class="flex items-center gap-2 text-xs text-purple-400 font-bold uppercase tracking-wider">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+                    <span>銀狼終端主機日誌 (Console System Log)</span>
+                </div>
+                <button onclick="clearLogs()" class="text-[10px] text-slate-500 hover:text-purple-400 transition-colors uppercase font-bold">
+                    [清除日誌]
+                </button>
+            </div>
+            
+            <!-- Logs box -->
+            <div id="consoleLogBox" class="h-28 overflow-y-auto console-scrollbar text-xs space-y-1.5 font-mono">
+                <!-- Log rows will render here -->
+                <div class="text-slate-500">&gt;&gt; [SYSTEM INITIALIZATION COMPLETED]...</div>
+                <div class="text-slate-500">&gt;&gt; 已成功登入虛擬次元。發現異常溢出漏洞怪獸。</div>
+                <div class="text-cyan-400">&gt;&gt; 銀狼：『準備好了，開始陪牠們玩玩吧。』</div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- OVERLAYS: MISSION COMPLETE / SYSTEM ERROR MODALS -->
+    <!-- Win modal -->
+    <div id="winModal" class="fixed inset-0 bg-slate-950/90 z-50 flex items-center justify-center p-4 hidden backdrop-blur-md">
+        <div class="max-w-md w-full bg-slate-950 rounded-2xl p-6 border-2 border-green-500 shadow-[0_0_30px_rgba(34,197,94,0.4)] text-center relative overflow-hidden">
+            <div class="absolute -top-10 -left-10 w-40 h-40 bg-green-500/10 rounded-full blur-3xl"></div>
+            <div class="pixel-font text-green-400 text-3xl mb-4 animate-bounce">MISSION COMPLETE</div>
+            <h3 class="text-xl font-black text-white mb-2">成功刪除虛擬 BUG！</h3>
+            <p class="text-sm text-slate-300 mb-6" id="winModalDesc">
+                銀狼成功攻破漏洞核心。獲得了 100 經驗值與 50 金幣！
+            </p>
+            <div class="space-y-3">
+                <button onclick="nextStage()" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-slate-950 font-black p-3 rounded-lg hover:from-green-400 hover:to-emerald-500 transition-all shadow-[0_0_15px_rgba(34,197,94,0.5)]">
+                    進入下一關 (NEXT STAGE)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lose modal -->
+    <div id="loseModal" class="fixed inset-0 bg-slate-950/90 z-50 flex items-center justify-center p-4 hidden backdrop-blur-md">
+        <div class="max-w-md w-full bg-slate-950 rounded-2xl p-6 border-2 border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.4)] text-center relative overflow-hidden">
+            <div class="absolute -top-10 -left-10 w-40 h-40 bg-red-500/10 rounded-full blur-3xl"></div>
+            <div class="pixel-font text-red-500 text-3xl mb-4 animate-pulse">SYSTEM ERROR</div>
+            <h3 class="text-xl font-black text-white mb-2">銀狼已被擊敗！</h3>
+            <p class="text-sm text-slate-300 mb-6">
+                防護系統遭完全侵蝕，請重置系統核心再次登入戰場！
+            </p>
+            <div class="space-y-3">
+                <button onclick="restartGame()" class="w-full bg-gradient-to-r from-red-500 to-rose-600 text-white font-black p-3 rounded-lg hover:from-red-400 hover:to-rose-500 transition-all shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+                    系統安全重啟 (REBOOT STAGE 1)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUDIO SYSTEM AND GAME LOGIC SCRIPT -->
+    <script>
+        // Audio Synthesizer (Web Audio API)
+        let audioCtx = null;
+        let isMuted = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // Play procedural synthesizer sound effects
+        function playSfx(type) {
+            if (isMuted) return;
+            initAudio();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'attack') {
+                // Laser shoot sound
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.15);
+                gainNode.gain.setValueAtTime(0.15, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } 
+            else if (type === 'crit') {
+                // Electric explosion
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(120, now);
+                osc.frequency.linearRampToValueAtTime(600, now + 0.05);
+                osc.frequency.exponentialRampToValueAtTime(10, now + 0.3);
+                
+                // Add minor white noise feel using frequency distortion
+                gainNode.gain.setValueAtTime(0.25, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } 
+            else if (type === 'heal') {
+                // Ascending charge up
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.linearRampToValueAtTime(800, now + 0.25);
+                
+                gainNode.gain.setValueAtTime(0.15, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            } 
+            else if (type === 'enemyAttack') {
+                // Growl glitched sound
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.exponentialRampToValueAtTime(40, now + 0.2);
+                
+                gainNode.gain.setValueAtTime(0.15, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            }
+            else if (type === 'bossAttack') {
+                // Double powerful glitched wave
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.setValueAtTime(280, now + 0.1);
+                osc.frequency.exponentialRampToValueAtTime(30, now + 0.3);
+                
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            }
+            else if (type === 'victory') {
+                // Upbeat retro chord
+                const notes = [261.63, 329.63, 392.00, 523.25]; // C4, E4, G4, C5
+                notes.forEach((freq, idx) => {
+                    const noteOsc = audioCtx.createOscillator();
+                    const noteGain = audioCtx.createGain();
+                    noteOsc.connect(noteGain);
+                    noteGain.connect(audioCtx.destination);
+                    
+                    noteOsc.type = 'sine';
+                    noteOsc.frequency.setValueAtTime(freq, now + (idx * 0.1));
+                    noteGain.gain.setValueAtTime(0.1, now + (idx * 0.1));
+                    noteGain.gain.exponentialRampToValueAtTime(0.01, now + (idx * 0.1) + 0.3);
+                    
+                    noteOsc.start(now + (idx * 0.1));
+                    noteOsc.stop(now + (idx * 0.1) + 0.35);
+                });
+            } 
+            else if (type === 'defeat') {
+                // Sad alarm & descending pitch
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.linearRampToValueAtTime(150, now + 0.2);
+                osc.frequency.linearRampToValueAtTime(80, now + 0.5);
+                
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.6);
+                osc.start(now);
+                osc.stop(now + 0.6);
+            }
+            else if (type === 'levelUp') {
+                // Super fast retro burst
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.linearRampToValueAtTime(1200, now + 0.4);
+                
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            }
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const icon = document.getElementById('soundIcon');
+            if (isMuted) {
+                icon.className = 'fa-solid fa-volume-xmark text-red-400';
+            } else {
+                icon.className = 'fa-solid fa-volume-high text-cyan-400';
+                initAudio();
+            }
+        }
+
+        // GAME STATE DATA
+        const gameState = {
+            // Player
+            player: {
+                level: 1,
+                hp: 100,
+                maxHp: 100,
+                atkMin: 10,
+                atkMax: 20,
+                critRate: 0.20, // 20%
+                healMin: 15,
+                healMax: 25,
+                xp: 0,
+                maxXp: 100,
+                gold: 0,
+                ultCooldown: 0
+            },
+            // Enemy / Boss
+            enemy: {
+                name: "BUG Monster",
+                hp: 100,
+                maxHp: 100,
+                atkMin: 5,
+                atkMax: 15,
+                icon: "👾",
+                trait: "溢出代碼 (威脅度低)",
+                isBoss: false
+            },
+            stage: 1,
+            isTurnActive: false
+        };
+
+        // MATRIX RAIN BACKGROUND EFFECT
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const letters = "0101010101010101ABCDEFHACKERBUGERROR";
+        const fontSize = 14;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        function initDrops() {
+            columns = canvas.width / fontSize;
+            drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.random() * -100;
+            }
+        }
+        initDrops();
+        window.addEventListener('resize', initDrops);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(5, 2, 12, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Matrix text color: Cyberpurple & Neon Pink
+            ctx.fillStyle = '#a855f7';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters[Math.floor(Math.random() * letters.length)];
+                
+                // Color variety
+                if (Math.random() > 0.9) {
+                    ctx.fillStyle = '#ec4899'; // Pink flash
+                } else {
+                    ctx.fillStyle = '#7c3aed'; // Deep purple
+                }
+
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        // FLOATING DAMAGE POPUP GENERATOR
+        function createDamagePop(value, isCrit, isHeal, isEnemy) {
+            const container = document.getElementById('arenaVFXBox');
+            const pop = document.createElement('div');
+            pop.className = 'damage-pop pixel-font';
+            
+            if (isHeal) {
+                pop.textContent = `+${value}`;
+                pop.style.color = '#4ade80'; // Bright Green
+                pop.style.textShadow = '0 0 8px #22c55e';
+            } else if (isCrit) {
+                pop.textContent = `CRIT! -${value}`;
+                pop.style.color = '#c084fc'; // Light Purple
+                pop.style.textShadow = '0 0 12px #a855f7';
+            } else {
+                pop.textContent = `-${value}`;
+                pop.style.color = isEnemy ? '#f43f5e' : '#22d3ee'; // Enemy damaged (pink/red) vs Player damaged (cyan)
+                pop.style.textShadow = isEnemy ? '0 0 8px #f43f5e' : '0 0 8px #0891b2';
+            }
+
+            // Random positioning slightly left/right
+            const offsetWidth = container.offsetWidth;
+            const leftOffset = isHeal 
+                ? (offsetWidth / 4) 
+                : (isEnemy ? (offsetWidth * 0.7) : (offsetWidth * 0.2));
+            
+            pop.style.left = `${leftOffset + (Math.random() * 40 - 20)}px`;
+            pop.style.top = `${container.offsetHeight / 3 + (Math.random() * 30 - 15)}px`;
+
+            container.appendChild(pop);
+
+            // Self-destruct popup after animation
+            setTimeout(() => {
+                pop.remove();
+            }, 800);
+        }
+
+        // CONSOLE LOGGER UTILITY
+        function addLog(message, type = 'default') {
+            const consoleBox = document.getElementById('consoleLogBox');
+            const logRow = document.createElement('div');
+            
+            let colorClass = 'text-slate-300';
+            if (type === 'player') colorClass = 'text-cyan-400 font-bold';
+            else if (type === 'enemy') colorClass = 'text-pink-500 font-bold';
+            else if (type === 'crit') colorClass = 'text-purple-400 font-black';
+            else if (type === 'heal') colorClass = 'text-green-400 font-bold';
+            else if (type === 'system') colorClass = 'text-yellow-400 font-bold';
+            else if (type === 'error') colorClass = 'text-rose-500 font-bold animate-pulse';
+
+            logRow.className = `${colorClass} transition-all duration-300`;
+            logRow.innerHTML = `&gt;&gt; ${message}`;
+            
+            consoleBox.appendChild(logRow);
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        }
+
+        function clearLogs() {
+            const consoleBox = document.getElementById('consoleLogBox');
+            consoleBox.innerHTML = '<div class="text-slate-500">&gt;&gt; [日誌終端重置已完成]</div>';
+        }
+
+        // CORE UI UPDATER
+        function updateUI() {
+            // Player HP
+            const playerHpPercent = (gameState.player.hp / gameState.player.maxHp) * 100;
+            document.getElementById('playerHpBar').style.width = `${playerHpPercent}%`;
+            document.getElementById('playerHpText').textContent = `${gameState.player.hp} / ${gameState.player.maxHp}`;
+            
+            // Low health alert
+            const playerPanel = document.getElementById('playerPanel');
+            if (playerHpPercent <= 20) {
+                playerPanel.classList.add('danger-pulse-active');
+                document.getElementById('playerHpText').classList.add('animate-pulse', 'text-red-500');
+            } else {
+                playerPanel.classList.remove('danger-pulse-active');
+                document.getElementById('playerHpText').classList.remove('animate-pulse', 'text-red-500');
+            }
+
+            // Enemy HP
+            const enemyHpPercent = (gameState.enemy.hp / gameState.enemy.maxHp) * 100;
+            document.getElementById('enemyHpBar').style.width = `${enemyHpPercent}%`;
+            document.getElementById('enemyHpText').textContent = `${gameState.enemy.hp} / ${gameState.enemy.maxHp}`;
+
+            // General Info
+            document.getElementById('playerLevelDisplay').textContent = gameState.player.level;
+            document.getElementById('playerExpText').textContent = `${gameState.player.xp} / ${gameState.player.maxXp}`;
+            document.getElementById('playerExpBar').style.width = `${(gameState.player.xp / gameState.player.maxXp) * 100}%`;
+            document.getElementById('playerGoldDisplay').textContent = gameState.player.gold;
+            
+            // Stage Display
+            document.getElementById('gameStageDisplay').textContent = gameState.enemy.isBoss 
+                ? `STAGE ${gameState.stage} (🔥 BOSS!)` 
+                : `STAGE ${gameState.stage} (Normal)`;
+
+            // Stats Sub-sheet Upgrades
+            document.getElementById('statAtkRange').textContent = `${gameState.player.atkMin} ~ ${gameState.player.atkMax}`;
+            document.getElementById('statCritChance').textContent = `${Math.round(gameState.player.critRate * 100)}% / 2.0x`;
+            document.getElementById('statHealRange').textContent = `${gameState.player.healMin} ~ ${gameState.player.healMax}`;
+
+            // Cooldown indicator text
+            const ultBtn = document.getElementById('btnUltimate');
+            const cdDisplay = document.getElementById('ultCooldownDisplay');
+            if (gameState.player.ultCooldown > 0) {
+                cdDisplay.textContent = `💥 駭客爆破：冷卻中 (${gameState.player.ultCooldown} 回合)`;
+                cdDisplay.className = "text-xs bg-slate-900 text-slate-500 border border-slate-700 px-3 py-0.5 rounded-full font-bold";
+                ultBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                cdDisplay.textContent = `💥 駭客爆破：準備就緒`;
+                cdDisplay.className = "text-xs bg-orange-950 text-orange-400 border border-orange-700 px-3 py-0.5 rounded-full font-bold";
+                ultBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // PLAY SPRITE ANIMATIONS
+        function triggerBattleEffect(attacker, actionType) {
+            const playerSprite = document.getElementById('playerActiveSprite');
+            const enemySprite = document.getElementById('enemyActiveSprite');
+            const beam = document.getElementById('cyberLaserBeam');
+            const enemyPanel = document.getElementById('enemyPanel');
+            const playerPanel = document.getElementById('playerPanel');
+
+            if (attacker === 'player') {
+                // Slam player sprite forward
+                playerSprite.style.transform = 'translateX(50px) scale(1.2)';
+                beam.style.transform = 'scaleX(1)';
+                
+                setTimeout(() => {
+                    playerSprite.style.transform = 'translateX(0) scale(1)';
+                    beam.style.transform = 'scaleX(0)';
+                    // Hit Enemy Panel glitched flash
+                    enemyPanel.classList.add('shake-active', 'glitch-active');
+                    setTimeout(() => {
+                        enemyPanel.classList.remove('shake-active', 'glitch-active');
+                    }, 300);
+                }, 150);
+            } 
+            else if (attacker === 'enemy') {
+                // Slam enemy sprite forward
+                enemySprite.style.transform = 'translateX(-50px) scale(1.2)';
+                
+                setTimeout(() => {
+                    enemySprite.style.transform = 'translateX(0) scale(1)';
+                    // Hit Player Panel glitched flash
+                    playerPanel.classList.add('shake-active', 'glitch-active');
+                    setTimeout(() => {
+                        playerPanel.classList.remove('shake-active', 'glitch-active');
+                    }, 300);
+                }, 150);
+            }
+        }
+
+        // BATTLE GAME LOGIC ENGINE
+        function executePlayerTurn(action) {
+            if (gameState.isTurnActive) return; // Prevent spam clicks
+            gameState.isTurnActive = true;
+
+            // 1. Check & decrements Cooldowns before executing action
+            let damageDealt = 0;
+            let healAmount = 0;
+            let isCrit = false;
+
+            if (action === 'attack') {
+                // Calculate Damage
+                const isCritRoll = Math.random() < gameState.player.critRate;
+                const baseAtk = Math.floor(Math.random() * (gameState.player.atkMax - gameState.player.atkMin + 1)) + gameState.player.atkMin;
+                
+                if (isCritRoll) {
+                    damageDealt = baseAtk * 2;
+                    isCrit = true;
+                } else {
+                    damageDealt = baseAtk;
+                }
+
+                // Apply logic
+                gameState.enemy.hp = Math.max(0, gameState.enemy.hp - damageDealt);
+                triggerBattleEffect('player', 'attack');
+                playSfx(isCrit ? 'crit' : 'attack');
+                createDamagePop(damageDealt, isCrit, false, true);
+
+                if (isCrit) {
+                    addLog(`銀狼 發動暴擊！造成 [${damageDealt}] 點溢出編碼傷害！`, 'crit');
+                } else {
+                    addLog(`銀狼 施展普通攻擊。怪獸受創 [${damageDealt}] 點。`, 'player');
+                }
+
+            } 
+            else if (action === 'heal') {
+                healAmount = Math.floor(Math.random() * (gameState.player.healMax - gameState.player.healMin + 1)) + gameState.player.healMin;
+                gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + healAmount);
+                
+                // Visuals
+                triggerBattleEffect('player', 'heal');
+                playSfx('heal');
+                createDamagePop(healAmount, false, true, false);
+                addLog(`銀狼 執行防護修復協定，恢復 [${healAmount}] 點 HP。`, 'heal');
+            } 
+            else if (action === 'ultimate') {
+                if (gameState.player.ultCooldown > 0) {
+                    addLog(`必殺技【駭客爆破】尚在冷卻中！`, 'error');
+                    gameState.isTurnActive = false;
+                    return;
+                }
+
+                // Ultimate high damage logic (30-50 dmg baseline)
+                damageDealt = Math.floor(Math.random() * (50 - 30 + 1)) + 30;
+                gameState.enemy.hp = Math.max(0, gameState.enemy.hp - damageDealt);
+                
+                // Add high tech explosion visuals
+                triggerBattleEffect('player', 'attack');
+                playSfx('crit');
+                createDamagePop(damageDealt, true, false, true);
+                addLog(`銀狼 施放必殺技【駭客爆破】！寫入毀滅病毒，怪獸重創 [${damageDealt}] 點！`, 'crit');
+
+                // Set cooldown
+                gameState.player.ultCooldown = 4; // Will end turn reducing to 3
+            }
+
+            // Post-action status updates
+            if (gameState.player.ultCooldown > 0) {
+                gameState.player.ultCooldown--;
+            }
+            
+            updateUI();
+
+            // Check if monster is eliminated
+            if (gameState.enemy.hp <= 0) {
+                handleVictory();
+                return;
+            }
+
+            // 2. ENEMY COUNTER TURN (After 0.8s)
+            document.getElementById('battleSubtext').textContent = "⚠️ 警報：怪獸正在寫入反擊核心...";
+            
+            setTimeout(() => {
+                if (gameState.enemy.hp <= 0) return; // double check
+
+                let enemyDamage = 0;
+                let isVirusStorm = false;
+
+                if (gameState.enemy.isBoss && Math.random() < 0.3) {
+                    // Boss Ultimate: Virus Storm
+                    enemyDamage = Math.floor(Math.random() * (35 - 20 + 1)) + 20;
+                    isVirusStorm = true;
+                } else {
+                    enemyDamage = Math.floor(Math.random() * (gameState.enemy.atkMax - gameState.enemy.atkMin + 1)) + gameState.enemy.atkMin;
+                }
+
+                gameState.player.hp = Math.max(0, gameState.player.hp - enemyDamage);
+                
+                triggerBattleEffect('enemy', 'attack');
+                playSfx(gameState.enemy.isBoss ? 'bossAttack' : 'enemyAttack');
+                createDamagePop(enemyDamage, isVirusStorm, false, false);
+
+                if (isVirusStorm) {
+                    addLog(`🔥 BOSS 施放【病毒風暴】！全體協議超載！銀狼受創 [${enemyDamage}] 點！`, 'error');
+                } else {
+                    addLog(`怪獸反擊！對 銀狼 造成 [${enemyDamage}] 點實體傷害。`, 'enemy');
+                }
+
+                updateUI();
+                
+                // Reset state to active
+                gameState.isTurnActive = false;
+                document.getElementById('battleSubtext').textContent = "系統防禦正常運作。請下達下一個操作指令。";
+
+                // Check loss state
+                if (gameState.player.hp <= 0) {
+                    handleDefeat();
+                }
+
+            }, 800);
+        }
+
+        // VICTORY HANDLER
+        function handleVictory() {
+            playSfx('victory');
+            addLog(`MISSION COMPLETE：成功刪除BUG！`, 'system');
+            
+            // Allocate Reward
+            const expReward = 100;
+            const goldReward = 50;
+            
+            gameState.player.xp += expReward;
+            gameState.player.gold += goldReward;
+
+            // Check Level up
+            let leveledUp = false;
+            if (gameState.player.xp >= gameState.player.maxXp) {
+                gameState.player.level++;
+                gameState.player.xp = gameState.player.xp - gameState.player.maxXp;
+                
+                // Increase base stats
+                gameState.player.maxHp += 15;
+                gameState.player.hp = gameState.player.maxHp; // Heal to full on level up
+                gameState.player.atkMin += 3;
+                gameState.player.atkMax += 5;
+                gameState.player.healMin += 2;
+                gameState.player.healMax += 4;
+
+                leveledUp = true;
+            }
+
+            // Set modal messages
+            const modalDesc = LeveledText = leveledUp 
+                ? `銀狼成功攻破漏洞核心。獲得了 100 經驗值與 50 金幣！<br><span class="text-yellow-400 font-extrabold text-lg pixel-font">▲ LEVEL UP! 銀狼升級至 ${gameState.player.level}! 最大HP與傷害皆已大幅提升！</span>`
+                : `銀狼成功攻破漏洞核心。獲得了 100 經驗值與 50 金幣！ (進度：${gameState.player.xp}/${gameState.player.maxXp})`;
+
+            document.getElementById('winModalDesc').innerHTML = modalDesc;
+            
+            if (leveledUp) {
+                setTimeout(() => playSfx('levelUp'), 400);
+            }
+
+            document.getElementById('winModal').classList.remove('hidden');
+        }
+
+        // DEFEAT HANDLER
+        function handleDefeat() {
+            playSfx('defeat');
+            addLog(`SYSTEM ERROR：銀狼被擊敗！防護遭瓦解！`, 'error');
+            document.getElementById('loseModal').classList.remove('hidden');
+        }
+
+        // UPGRADES AND CHIP SYSTEM
+        function buyUpgrade(type) {
+            initAudio();
+            if (type === 'attack') {
+                if (gameState.player.gold >= 100) {
+                    gameState.player.gold -= 100;
+                    gameState.player.atkMin += 5;
+                    gameState.player.atkMax += 5;
+                    playSfx('levelUp');
+                    addLog(`🛒 商店：購買「火力提升晶片」！基礎傷害提升 5 點。`, 'system');
+                } else {
+                    addLog(`❌ 商店：金幣餘額不足，需要 100 G。`, 'error');
+                    playSfx('enemyAttack');
+                }
+            } 
+            else if (type === 'heal') {
+                if (gameState.player.gold >= 80) {
+                    gameState.player.gold -= 80;
+                    gameState.player.healMin += 10;
+                    gameState.player.healMax += 10;
+                    playSfx('levelUp');
+                    addLog(`🛒 商店：購買「高級修復核心」！系統修復量增加 10 點。`, 'system');
+                } else {
+                    addLog(`❌ 商店：金幣餘額不足，需要 80 G。`, 'error');
+                    playSfx('enemyAttack');
+                }
+            } 
+            else if (type === 'crit') {
+                if (gameState.player.gold >= 120) {
+                    if (gameState.player.critRate >= 0.80) {
+                        addLog(`🛒 商店：暴擊率已達上限系統飽和！`, 'system');
+                        return;
+                    }
+                    gameState.player.gold -= 120;
+                    gameState.player.critRate += 0.10;
+                    playSfx('levelUp');
+                    addLog(`🛒 商店：購買「駭客爆裂模組」！暴擊率永久增加 10%。`, 'system');
+                } else {
+                    addLog(`❌ 商店：金幣餘額不足，需要 120 G。`, 'error');
+                    playSfx('enemyAttack');
+                }
+            }
+            updateUI();
+        }
+
+        // NEXT STAGE GENERATOR (PROGRESSIVE DIFFICULTY)
+        function nextStage() {
+            document.getElementById('winModal').classList.add('hidden');
+            gameState.stage++;
+            gameState.isTurnActive = false;
+
+            // Heal player slightly between stages
+            gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + Math.floor(gameState.player.maxHp * 0.3));
+
+            // Generate Enemy or BOSS based on stage
+            if (gameState.stage % 3 === 0) {
+                // BOSS Mode
+                gameState.enemy = {
+                    name: "SYSTEM_ROOT_VIRUS",
+                    hp: 300,
+                    maxHp: 300,
+                    atkMin: 15,
+                    atkMax: 30,
+                    icon: "🦠🐙",
+                    trait: "終極狂暴代碼 (全體風暴)",
+                    isBoss: true
+                };
+                
+                document.getElementById('enemyName').innerHTML = `${gameState.enemy.name} <span class="text-xs bg-red-950 px-2 py-0.5 rounded border border-red-800">超級終端</span>`;
+                document.getElementById('enemyIcon').textContent = "🐙";
+                document.getElementById('enemySub').textContent = `危險等級：★★★★★ - 終端病毒宿主`;
+                document.getElementById('bossBadge').classList.remove('hidden');
+                document.getElementById('enemyTraitDisplay').textContent = "全體風暴 / 超高生命";
+                document.getElementById('enemyFuryDisplay').textContent = "狂暴已啟用";
+                document.getElementById('enemyFuryDisplay').className = "font-bold text-red-500 animate-pulse";
+                
+                addLog(`⚠️ STAGE ${gameState.stage} ALERT：發現終端核心威脅：${gameState.enemy.name}！全面展開戰鬥！`, 'error');
+            } else {
+                // Scaling Normal Monster
+                const monsterHp = 100 + (gameState.stage * 15);
+                const monsterAtkMin = 5 + (gameState.stage * 2);
+                const monsterAtkMax = 15 + (gameState.stage * 3);
+                
+                const bugNames = ["BUG Monster", "GLITCH Virus", "TROJAN Dropper", "WORM Malicious"];
+                const bugEmojis = ["👾", "🦠", "💻", "🤖"];
+                
+                const randomName = bugNames[Math.floor(Math.random() * bugNames.length)];
+                const randomEmoji = bugEmojis[Math.floor(Math.random() * bugEmojis.length)];
+
+                gameState.enemy = {
+                    name: `${randomName}_v${gameState.stage}.0`,
+                    hp: monsterHp,
+                    maxHp: monsterHp,
+                    atkMin: monsterAtkMin,
+                    atkMax: monsterAtkMax,
+                    icon: randomEmoji,
+                    trait: `代碼變體 (難度 ${gameState.stage})`,
+                    isBoss: false
+                };
+
+                document.getElementById('enemyName').innerHTML = `${gameState.enemy.name} <span class="text-xs bg-pink-950 px-2 py-0.5 rounded border border-pink-800">代碼變體</span>`;
+                document.getElementById('enemyIcon').textContent = gameState.enemy.icon;
+                document.getElementById('enemySub').textContent = `危險等級：★★★☆☆ - 等級 ${gameState.stage} 滲透威脅`;
+                document.getElementById('bossBadge').classList.add('hidden');
+                document.getElementById('enemyTraitDisplay').textContent = gameState.enemy.trait;
+                document.getElementById('enemyFuryDisplay').textContent = "未啟用";
+                document.getElementById('enemyFuryDisplay').className = "font-bold text-slate-500";
+                
+                addLog(`進入關卡 ${gameState.stage}。新的漏洞代碼 ${gameState.enemy.name} 已生成。`, 'system');
+            }
+
+            document.getElementById('battleSubtext').textContent = "系統重新掃描完畢。核心威脅已加載。";
+            updateUI();
+        }
+
+        // REBOOT GAME RESETTER
+        function restartGame() {
+            document.getElementById('loseModal').classList.add('hidden');
+            
+            // Hard reset to default state
+            gameState.stage = 1;
+            gameState.isTurnActive = false;
+            
+            gameState.player = {
+                level: 1,
+                hp: 100,
+                maxHp: 100,
+                atkMin: 10,
+                atkMax: 20,
+                critRate: 0.20,
+                healMin: 15,
+                healMax: 25,
+                xp: 0,
+                maxXp: 100,
+                gold: 0,
+                ultCooldown: 0
+            };
+
+            gameState.enemy = {
+                name: "BUG Monster",
+                hp: 100,
+                maxHp: 100,
+                atkMin: 5,
+                atkMax: 15,
+                icon: "👾",
+                trait: "溢出代碼 (威脅度低)",
+                isBoss: false
+            };
+
+            // Dynamic UI updates
+            document.getElementById('enemyName').innerHTML = `BUG Monster <span class="text-xs bg-pink-950 px-2 py-0.5 rounded border border-pink-800">病毒怪</span>`;
+            document.getElementById('enemyIcon').textContent = "👾";
+            document.getElementById('enemySub').textContent = `危險等級：★★☆☆☆ - 未知溢出錯誤`;
+            document.getElementById('bossBadge').classList.add('hidden');
+            document.getElementById('enemyTraitDisplay').textContent = "溢出代碼 (威脅度低)";
+            document.getElementById('enemyFuryDisplay').textContent = "未啟用";
+            document.getElementById('enemyFuryDisplay').className = "font-bold text-slate-500";
+
+            clearLogs();
+            addLog(`&gt;&gt; [系統安全引導已重置]...`, 'system');
+            addLog(`銀狼：『這一次，我會速戰速決。』`, 'player');
+
+            document.getElementById('battleSubtext').textContent = "主防護網已完全刷新，隨時可發起進攻協定。";
+            updateUI();
+        }
+
+        // LOOP START AND ATTACH INITIALIZER
+        let matrixInterval;
+        window.onload = function() {
+            matrixInterval = setInterval(drawMatrix, 40);
+            updateUI();
+        };
+    </script>
+</body>
+</html>
